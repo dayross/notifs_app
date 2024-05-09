@@ -1,13 +1,27 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 part 'notification_event.dart';
 part 'notification_state.dart';
 
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
-  NotificationBloc() : super(NotificationInitial()) {
-    on<NotificationEvent>((event, emit) {
-      // TODO: implement event handler
-    });
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  NotificationBloc() : super(const NotificationState()) {
+  }
+
+  void requestPermission() async{
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+      );
+    settings.authorizationStatus;
   }
 }
+
