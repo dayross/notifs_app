@@ -17,9 +17,22 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async{
   print('Handling a bg message: ${message.messageId}');
 }
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  NotificationBloc() : super(const NotificationState() ){
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  int pushNumberId = 0;
+
+  final Future<void> Function()? requestLocalNotificationPermissions;
+  final void Function({
+        required int id,
+        String? title,
+        String? body,
+        String? data,
+    })? showLocalNotification;
+
+  NotificationBloc({
+      this.showLocalNotification,
+      this.requestLocalNotificationPermissions
+  }) : super(const NotificationState() ){
     on<NotificationsStatusChanged>(_notificationStatusChanged);
     on<NotificationReceived>(_onPushMessageReceived);
 
@@ -82,6 +95,14 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       ? message.notification!.android?.imageUrl 
       : message.notification!.apple?.imageUrl 
       );
+      if(showLocalNotification != null){
+      showLocalNotification!(
+        id: ++pushNumberId,
+        body: notification.body,
+        data: notification.messageId,
+        title: notification.title
+        );
+      }
       print(notification);
       add(NotificationReceived(notification));
 
@@ -103,8 +124,10 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       );
 
       // solicitar permiso para las local notifs
-      await LocalNotifications.requestPermissionLocalNotification();
-
+      if(requestLocalNotificationPermissions != null){
+        await requestLocalNotificationPermissions!();
+        // await LocalNotifications.requestPermissionLocalNotification();
+      }
       add(NotificationsStatusChanged(settings.authorizationStatus));
   }
 

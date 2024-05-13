@@ -1,5 +1,8 @@
 
+import 'dart:convert';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:notifs_app/config/router/app_router.dart';
 
 
 class LocalNotifications{
@@ -23,6 +26,7 @@ class LocalNotifications{
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
+      onDidReceiveNotificationResponse: onDidReceiveNotificationResponse
       // TODO
       // onDidReceiveBackgroundNotificationResponse: onDidReceiveBackgroundNotificationResponse
       );
@@ -38,7 +42,27 @@ class LocalNotifications{
       'channelId',
       'channelName',
       playSound: true,
-      
-      )
+      sound: RawResourceAndroidNotificationSound('notif_tone'),
+      importance: Importance.high,
+      priority: Priority.high
+      );
+
+      const notificationDetails = NotificationDetails(
+        android: androidDetails,
+        // TODO iOS config
+      );
+
+      final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+      flutterLocalNotificationsPlugin.show(
+        id, 
+        title,
+        body, 
+        notificationDetails,
+        payload: data);
   }
+  
+  static void onDidReceiveNotificationResponse(NotificationResponse response){
+    appRouter.push('/push-details/${response.payload}');
+  } 
+
 }
