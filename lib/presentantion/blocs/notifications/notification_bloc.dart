@@ -6,17 +6,23 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:notifs_app/firebase_options.dart';
 
+import '../../../config/local_notifications/local_notifications.dart';
 import '../../../domain/entities/push_message.dart';
 
 part 'notification_event.dart';
 part 'notification_state.dart';
 
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async{
+  await Firebase.initializeApp();
+  print('Handling a bg message: ${message.messageId}');
+}
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   NotificationBloc() : super(const NotificationState() ){
     on<NotificationsStatusChanged>(_notificationStatusChanged);
-    
+    on<NotificationReceived>(_onPushMessageReceived);
+
     // verificar estado de notificaciones
     _initialStatusCheck();
 
@@ -39,22 +45,30 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     );
     _getFCMToken();
   }
+  
+  void _onPushMessageReceived(NotificationReceived event, Emitter<NotificationState> emit){
+    emit(
+      state.copyWith(
+        notifications: [event.pushMessage, ...state.notifications]
+      )
+    ); 
+  }
 
   void _initialStatusCheck() async{
     // para saber el estado de las notificaciones
     final settings = await messaging.getNotificationSettings();
-    settings.authorizationStatus;
+    add( NotificationsStatusChanged(settings.authorizationStatus) );
   }
 
   void _getFCMToken() async{
     // para obtener el token si estamoa autorizados para notifs
-    final settings = await messaging.getNotificationSettings();
-    if(settings.authorizationStatus !=  AuthorizationStatus.authorized) return;
+    // final settings = await messaging.getNotificationSettings();
+    if ( state.status != AuthorizationStatus.authorized ) return;
     final token = await messaging.getToken();
     print(token);
   }
 
-  void _handleRemoteMessage(RemoteMessage message) {
+  void handleRemoteMessage(RemoteMessage message) {
     if(message.notification == null) return;
     final notification = PushMessage(
       messageId: message.messageId
@@ -69,11 +83,12 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       : message.notification!.apple?.imageUrl 
       );
       print(notification);
+      add(NotificationReceived(notification));
+
   }
 
-
   void _onForegroundMessage(){
-    FirebaseMessaging.onMessage.listen(_handleRemoteMessage); 
+    FirebaseMessaging.onMessage.listen(handleRemoteMessage); 
   }
 
   void requestPermission() async{
@@ -82,11 +97,21 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       announcement: false,
       badge: true,
       carPlay: false,
-      criticalAlert: false,
+      criticalAlert: true,
       provisional: false,
       sound: true,
       );
+
+      // solicitar permiso para las local notifs
+      await LocalNotifications.requestPermissionLocalNotification();
+
       add(NotificationsStatusChanged(settings.authorizationStatus));
+  }
+
+  PushMessage? getMessageById(String pushMessageId){
+    final exist = state.notifications.any((element) => element.messageId == pushMessageId);
+    if (!exist) return null;
+    return state.notifications.firstWhere((element) => element.messageId == pushMessageId);
   }
 }
 
