@@ -4,7 +4,9 @@ import 'package:notifs_app/config/router/app_router.dart';
 import 'package:notifs_app/config/theme/app_theme.dart';
 import 'package:notifs_app/presentantion/blocs/notifications/notification_bloc.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationBloc.initializeFCM(); 
   runApp(
     MultiBlocProvider(
       providers: [

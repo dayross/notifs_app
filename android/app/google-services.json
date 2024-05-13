@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "379032273559",
+    "project_id": "notifs-app-2b377",
+    "storage_bucket": "notifs-app-2b377.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379032273559:android:e0fd02d73ec35bfb5c9fd2",
+        "android_client_info": {
+          "package_name": "com.daydev.notifs_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAb3dDXTbnD2RCi3filvNECt8oIuobFFDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
