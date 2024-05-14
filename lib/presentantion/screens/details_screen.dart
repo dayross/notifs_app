@@ -16,7 +16,7 @@ class DetailsScreen extends StatelessWidget {
     
     return Scaffold(
       appBar: AppBar(
-        title: Text('detalles notif'),),
+        title: const Text('detalles notif'),),
         body: (message != null)
         ? _DetailsView(message: message)
         : const Center(child: Text('Notificación no existe'),),
@@ -35,7 +35,7 @@ class _DetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final textStyles = Theme.of(context).textTheme;
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
       child: Column(
         children: [
           if(message.imageUrl != null) Image.network(message.imageUrl!),

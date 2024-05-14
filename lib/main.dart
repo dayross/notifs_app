@@ -8,6 +8,8 @@ import 'package:notifs_app/presentantion/blocs/notifications/notification_bloc.d
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
   await NotificationBloc.initializeFCM(); 
   await LocalNotifications.initializeLocalNotifications();
   

@@ -1,5 +1,4 @@
 
-import 'dart:convert';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:notifs_app/config/router/app_router.dart';
@@ -17,10 +16,12 @@ class LocalNotifications{
 
     final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     const initSettingsAndroid = AndroidInitializationSettings('app_icon');
-    // TODO iOS config
+    const initSettingsDarwin = DarwinInitializationSettings(
+      onDidReceiveLocalNotification: iosShowNotification);
+
     const initializationSettings = InitializationSettings(
       android: initSettingsAndroid,
-      // TODO iOS config
+      iOS: initSettingsDarwin,
       );
 
 
@@ -30,6 +31,10 @@ class LocalNotifications{
       // TODO
       // onDidReceiveBackgroundNotificationResponse: onDidReceiveBackgroundNotificationResponse
       );
+  }
+
+  static void iosShowNotification(int id, String? title, String? body, String? data){
+    showLocalNotification(id: id, title: title, body: body, data: data);
   }
 
   static void showLocalNotification({
@@ -49,7 +54,9 @@ class LocalNotifications{
 
       const notificationDetails = NotificationDetails(
         android: androidDetails,
-        // TODO iOS config
+        iOS: DarwinNotificationDetails(
+          presentSound: true
+        )
       );
 
       final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();

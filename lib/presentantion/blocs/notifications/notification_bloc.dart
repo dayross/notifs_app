@@ -6,7 +6,6 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:notifs_app/firebase_options.dart';
 
-import '../../../config/local_notifications/local_notifications.dart';
 import '../../../domain/entities/push_message.dart';
 
 part 'notification_event.dart';
